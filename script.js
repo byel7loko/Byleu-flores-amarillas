@@ -1036,7 +1036,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
 
-    /* =======================================================
+/* =======================================================
      20. ORIENTACIÓN DEL TELÉFONO
   ======================================================= */
 
@@ -1046,4 +1046,272 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(() => {
 
-        if (gardenStarted) 
+        if (gardenStarted) {
+
+          createFlowers();
+          createPetals();
+          createFireflies();
+          createGoldDust();
+
+          updateGalaxyTransform();
+        }
+
+      }, 400);
+
+    }
+  );
+
+  /* =======================================================
+     21. MOVIMIENTO SUAVE DE TEXTOS FLOTANTES
+  ======================================================= */
+
+  function prepareFloatingTexts() {
+
+    const texts =
+      document.querySelectorAll(
+        ".floating-text"
+      );
+
+    texts.forEach((text, index) => {
+
+      const delay =
+        random(-8, 0);
+
+      const duration =
+        random(5, 10);
+
+      text.style.setProperty(
+        "--float-delay",
+        `${delay}s`
+      );
+
+      text.style.setProperty(
+        "--float-duration",
+        `${duration}s`
+      );
+
+      text.style.setProperty(
+        "--float-index",
+        index
+      );
+
+    });
+  }
+
+  prepareFloatingTexts();
+
+
+  /* =======================================================
+     22. ESTRELLAS DE LA GALAXIA
+  ======================================================= */
+
+  function prepareGalaxyStars() {
+
+    if (!galaxyScene) return;
+
+    const stars =
+      galaxyScene.querySelectorAll(
+        ".floating-star"
+      );
+
+    stars.forEach((star, index) => {
+
+      star.style.animationDelay =
+        `${random(-5, 0)}s`;
+
+      star.style.animationDuration =
+        `${random(2.5, 6)}s`;
+
+      star.style.setProperty(
+        "--star-index",
+        index
+      );
+
+    });
+  }
+
+  prepareGalaxyStars();
+
+
+  /* =======================================================
+     23. EFECTO HOVER EN GIRASOLES
+  ======================================================= */
+
+  const sunflowers =
+    document.querySelectorAll(
+      ".sunflower"
+    );
+
+  sunflowers.forEach((sunflower) => {
+
+    sunflower.addEventListener(
+      "pointerenter",
+      () => {
+
+        sunflower.classList.add(
+          "flower-hover"
+        );
+
+      }
+    );
+
+    sunflower.addEventListener(
+      "pointerleave",
+      () => {
+
+        sunflower.classList.remove(
+          "flower-hover"
+        );
+
+      }
+    );
+
+  });
+
+
+  /* =======================================================
+     24. EVITAR SELECCIÓN DURANTE DRAG
+  ======================================================= */
+
+  if (galaxyWrapper) {
+
+    galaxyWrapper.addEventListener(
+      "selectstart",
+      (event) => {
+
+        if (isDragging) {
+          event.preventDefault();
+        }
+
+      }
+    );
+
+ }
+
+  /* =======================================================
+     25. ACCESIBILIDAD
+  ======================================================= */
+
+  if (letterOverlay) {
+
+    letterOverlay.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (
+          event.key !== "Tab" ||
+          !letterOverlay.classList.contains("show")
+        ) {
+          return;
+        }
+
+        const focusable =
+          letterOverlay.querySelectorAll(
+            "button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
+          );
+
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last =
+          focusable[focusable.length - 1];
+
+        if (
+          event.shiftKey &&
+          document.activeElement === first
+        ) {
+
+          event.preventDefault();
+          last.focus();
+
+        } else if (
+          !event.shiftKey &&
+          document.activeElement === last
+        ) {
+
+          event.preventDefault();
+          first.focus();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  /* =======================================================
+     26. TEXTO INTRODUCTORIO
+  ======================================================= */
+
+  if (introTitle) {
+    introTitle.setAttribute(
+      "data-ready",
+      "true"
+    );
+  }
+
+  if (introText) {
+    introText.setAttribute(
+      "data-ready",
+      "true"
+    );
+  }
+
+
+  /* =======================================================
+     27. EVITAR SCROLL CUANDO SE ARRASTRA LA GALAXIA
+  ======================================================= */
+
+  document.addEventListener(
+    "touchmove",
+    (event) => {
+
+      if (isDragging) {
+        event.preventDefault();
+      }
+
+    },
+    { passive: false }
+  );
+
+
+  /* =======================================================
+     28. INICIALIZACIÓN
+  ======================================================= */
+
+  updateGalaxyTransform();
+
+  if (isTouchDevice && galaxyHint) {
+    galaxyHint.textContent =
+      "✨ Desliza para mover la galaxia ✨";
+  }
+
+
+  /* =======================================================
+     29. PRE-CARGA VISUAL
+  ======================================================= */
+
+  if (garden) {
+    garden.style.visibility = "visible";
+  }
+
+
+  /* =======================================================
+     30. LIMPIEZA AL SALIR
+  ======================================================= */
+
+  window.addEventListener(
+    "beforeunload",
+    () => {
+
+      if (animationFrame) {
+        cancelAnimationFrame(
+          animationFrame
+        );
+      }
+
+    }
+  );
+
+});
