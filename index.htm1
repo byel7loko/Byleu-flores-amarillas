@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#020108"
+  >
+
+  <meta
+    name="description"
+    content="Una sorpresa especial con flores amarillas 🌻"
+  >
+
+  <title>Flores Amarillas 🌻</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="scene" id="scene">
+
+    <!-- =================================================
+         ESPACIO
+    ================================================== -->
+
+    <div class="stars" aria-hidden="true"></div>
+    <div class="stars stars-2" aria-hidden="true"></div>
+    <div class="stars stars-3" aria-hidden="true"></div>
+
+    <div
+      class="gold-dust"
+      id="goldDust"
+      aria-hidden="true"
+    ></div>
+
+    <div class="space-glow glow-1"></div>
+    <div class="space-glow glow-2"></div>
+    <div class="space-glow glow-3"></div>
+
+
+    <!-- =================================================
+         INTRO
+    ================================================== -->
+
+    <section class="intro" id="intro">
+
+      <div class="intro-flower" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <b></b>
+      </div>
+
+      <p class="intro-small">
+        🌻 UNA SORPRESA PARA mi niña 🌻
+      </p>
+
+      <h1 id="introTitle">
+        Feliz Día de las<br>
+        Flores Amarillas
+      </h1>
+
+      <p id="introText">
+        Preparé algo especial para ti
+      </p>
+
+      <button
+        class="open-btn"
+        id="openBtn"
+        type="button"
+      >
+        <span class="open-sunflower">🌻</span>
+        <span>Toca para iniciar</span>
+      </button>
+
+      <p class="hint">
+        ✨ Toca para descubrir la sorpresa ✨
+      </p>
+
+    </section>
+
+
+    <!-- =================================================
+         JARDÍN
+    ================================================== -->
+
+    <section
+      class="garden"
+      id="garden"
+      aria-hidden="true"
+    >
+
+      <!-- Universo infinito -->
+      <div class="universe" aria-hidden="true"></div>
+
+      <div class="nebula nebula-1"></div>
+      <div class="nebula nebula-2"></div>
+      <div class="nebula nebula-3"></div>
+
+      <div class="moon"></div>
+
+      <!-- =================================================
+           GALAXIA
+      ================================================== -->
+
+      <div
+        class="galaxy-wrapper"
+        id="galaxyWrapper"
+      >
+
+        <div
+          class="galaxy-scene"
+          id="galaxyScene"
+        >
+
+          <div class="galaxy-core">
+
+            <div class="core-glow"></div>
+
+            <div class="core-ring">
+              <span>🌻</span>
+            </div>
+
+          </div>
+
+
+          <!-- ÓRBITA 1 -->
+
+          <div class="orbit orbit-1">
+            <div class="orbit-ring"></div>
+
+            <div class="sunflower">
+              🌻
+            </div>
+
+            <div class="galaxy-orbit-text">
+              Para ti 💛
+            </div>
+          </div>
+
+
+          <!-- ÓRBITA 2 -->
+
+          <div class="orbit orbit-2">
+            <div class="orbit-ring"></div>
+
+            <div class="sunflower">
+              🌻
+            </div>
+
+            <div class="galaxy-orbit-text">
+              Siempre ✨
+            </div>
+          </div>
+
+
+          <!-- ÓRBITA 3 -->
+
+          <div class="orbit orbit-3">
+            <div class="orbit-ring"></div>
+
+            <div class="sunflower">
+              🌻
+            </div>
+
+            <div class="galaxy-orbit-text">
+              Con cariño 💛
+            </div>
+          </div>
+
+
+          <!-- ÓRBITA 4 -->
+
+          <div class="orbit orbit-4">
+            <div class="orbit-ring"></div>
+
+            <div class="sunflower">
+              🌻
+            </div>
+
+            <div class="galaxy-orbit-text">
+              Para hacerte sonreír
+            </div>
+          </div>
+
+
+          <!-- ESTRELLAS -->
+
+          <div class="floating-star star-1">✦</div>
+          <div class="floating-star star-2">✧</div>
+          <div class="floating-star star-3">✦</div>
+          <div class="floating-star star-4">·</div>
+          <div class="floating-star star-5">✧</div>
+          <div class="floating-star star-6">✦</div>
+          <div class="floating-star star-7">✧</div>
+          <div class="floating-star star-8">✦</div>
+          <div class="floating-star star-9">·</div>
+          <div class="floating-star star-10">✧</div>
+          <div class="floating-star star-11">✦</div>
+          <div class="floating-star star-12">✧</div>
+          <div class="floating-star star-13">✧</div>
+          <div class="floating-star star-14">✧</div>
+          <div class="floating-star star-15">✧</div>
+          <div class="floating-star star-16">✧</div>
+          <div class="floating-star star-17">✧</div>
+          <div class="floating-star star-18">✧</div>
+          <div class="floating-star star-19">✧</div>
+          <div class="floating-star star-20">✧</div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           MENSAJE GALAXIA
+      ================================================== -->
+
+      <div
+        class="galaxy-message"
+        id="galaxyHint"
+      >
+        ✨ Arrastra la galaxia ✨
+      </div>
+
+
+      <!-- =================================================
+           TEXTOS FLOTANTES
+      ================================================== -->
+
+      <div class="floating-text text-1">
+        Para la mejor niña 💛
+      </div>
+
+      <div class="floating-text text-2">
+        cada estrella es un te quiero 
+      </div>
+
+      <div class="floating-text text-3">
+        Flores para la persona que aprecio 🌻
+      </div>
+
+      <div class="floating-text text-4">
+        espero nunca falten las sonrisas 
+      </div>
+
+      <div class="floating-text text-5">
+        Un pequeño detalle para ti ✨
+      </div>
+
+      <div class="floating-text text-6">
+        Porque te lo mereces ✨
+      </div>
+
+      <div class="floating-text text-7">
+        Feliz día te quiero mucho 🌼
+      </div>
+
+      <div class="floating-text text-8">
+        Siempre seras mi flor favorita 
+      </div>
+
+      <div class="floating-text text-9">
+        Qué bonito coincidir contigo
+      </div>
+
+      <div class="floating-text text-10">
+        Gracias por estar siempre conmigo 
+      </div>
+
+      <div class="floating-text text-11">
+        Un detalle hecho con cariño ✨ 
+      </div>
+
+      <div class="floating-text text-12">
+        Para hacerte sonreír
+      </div>
+
+      <div class="floating-text text-13">
+        🌻 espero te haga feliz este detalle 
+      </div>
+
+      <div class="floating-text text-14">
+        Que tu día brille asi como brillas tu ✨
+      </div>
+
+      <div class="floating-text text-15">
+        Siempre habrá flores para ti mi reyna💛
+      </div>
+
+      <div class="floating-text text-16">
+        Sonríe y nunca lo dejes de hacer 🌼
+      </div>
+
+
+      <!-- =================================================
+           MENSAJE CENTRAL
+      ================================================== -->
+
+      <div class="hero-message">
+
+        <div class="spark-line">
+          ✦　✧　✦　✧　✦
+        </div>
+
+        <p class="hero-kicker">
+          PARA ALGUIEN ESPECIAL
+        </p>
+
+        <h2 id="messageTitle">
+          Feliz Día de las<br>
+          <strong>Flores Amarillas</strong> 🌻
+        </h2>
+
+        <p id="messageBody">
+          Que este pequeño detalle te recuerde
+          lo especial que eres y lo mucho que te quiero.
+        </p>
+
+      </div>
+
+
+      <!-- =================================================
+           FLORES
+      ================================================== -->
+
+      <div
+        class="flowers"
+        id="flowers"
+        aria-hidden="true"
+      ></div>
+
+
+      <!-- =================================================
+           PÉTALOS
+      ================================================== -->
+
+      <div
+        class="petals"
+        id="petals"
+        aria-hidden="true"
+      ></div>
+
+
+      <!-- =================================================
+           LUCIÉRNAGAS
+      ================================================== -->
+
+      <div
+        class="fireflies"
+        id="fireflies"
+        aria-hidden="true"
+      ></div>
+
+
+      <!-- =================================================
+           PARTÍCULAS
+      ================================================== -->
+
+      <div
+        class="particle-heart"
+        id="particleHeart"
+        aria-hidden="true"
+      ></div>
+
+
+      <!-- =================================================
+           BOTÓN CARTA
+      ================================================== -->
+
+      <button
+        class="letter-button"
+        id="letterBtn"
+        type="button"
+        aria-label="Abrir carta"
+      >
+        💌
+      </button>
+
+
+      <!-- =================================================
+           CARTA
+      ================================================== -->
+
+      <div
+        class="letter-overlay"
+        id="letterOverlay"
+        aria-hidden="true"
+      >
+
+        <div
+          class="letter-card"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="letterTitle"
+        >
+
+          <button
+            class="close-letter"
+            id="closeLetter"
+            type="button"
+            aria-label="Cerrar carta"
+          >
+            ×
+          </button>
+
+          <div class="letter-flower">
+            🌻
+          </div>
+
+          <p class="letter-kicker">
+            UNA CARTITA PARA TI
+          </p>
+
+          <h3 id="letterTitle">
+            Para ti  💛
+          </h3>
+
+          <div class="letter-line"></div>
+
+          <p class="letter-text">
+            Hoy quería regalarte algo diferente.
+            Tal vez unas flores no puedan decir todo
+            lo que quisiera, pero sí pueden recordarte
+            que hay momentos bonitos que merecen ser
+            guardados y este es uno de ellos.
+          </p>
+
+          <p class="letter-text">
+             Espero que cada vez que veas una flor amarilla recuerdes 
+            que alguien quiso hacerte sonreír y no olvides lo mucho 
+            que te quiero y aprecio demasiado el apoyo que me has dado 
+            en este tiempo que llevas aquí y que sepas que eres una gran 
+            mujer y una exelente niña con una forma de ser única y que 
+            no te dejes llevar por cosas random espero te guste este detalle
+            que hize para ti. ✨
+
+Con mucho cariño para ti 
+          </p>
+
+          <p class="letter-sign">
+            Con mucho cariño para el amor de mi vida✨
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+           REPETIR
+      ================================================== -->
+
+      <button
+        class="replay-btn"
+        id="replayBtn"
+        type="button"
+      >
+        ↻ Ver de nuevo
+      </button>
+
+
+      <p
+        class="footer-note"
+        id="footerNote"
+      >
+        Hecho especialmente para ti ✨
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <noscript>
+    Esta página necesita JavaScript para mostrar la animación.
+  </noscript>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
