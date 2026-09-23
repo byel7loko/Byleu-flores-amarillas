@@ -1,768 +1,1049 @@
-const CONFIG = {
+/* =========================================================
+   FLORES AMARILLAS 🌻
+   SCRIPT PRINCIPAL
+========================================================= */
 
-  pageTitle:
-    "Feliz Día de las Flores Amarillas 🌻",
+document.addEventListener("DOMContentLoaded", () => {
 
-  introTitle:
-    "Feliz Día de las Flores Amarillas",
+  "use strict";
 
-  introText:
-    "Preparé algo especial para ti",
+  /* =======================================================
+     1. ELEMENTOS PRINCIPALES
+  ======================================================= */
 
-  messageTitle:
-    "Feliz Día de las Flores Amarillas",
+  const scene = document.getElementById("scene");
+  const intro = document.getElementById("intro");
+  const openBtn = document.getElementById("openBtn");
+  const garden = document.getElementById("garden");
 
-  messageBody:
-    "Que este pequeño detalle te recuerde lo especial que eres.",
+  const galaxyWrapper = document.getElementById("galaxyWrapper");
+  const galaxyScene = document.getElementById("galaxyScene");
+  const galaxyHint = document.getElementById("galaxyHint");
 
-  footer:
-    "Hecho especialmente para ti ✨",
+  const particleHeart = document.getElementById("particleHeart");
+  const flowersContainer = document.getElementById("flowers");
+  const petalsContainer = document.getElementById("petals");
+  const firefliesContainer = document.getElementById("fireflies");
+  const goldDust = document.getElementById("goldDust");
 
-  /* Cantidades */
+  const letterBtn = document.getElementById("letterBtn");
+  const letterOverlay = document.getElementById("letterOverlay");
+  const closeLetter = document.getElementById("closeLetter");
 
-  flowerCount: 22,
+  const replayBtn = document.getElementById("replayBtn");
 
-  petalCount: 38,
+  const introTitle = document.getElementById("introTitle");
+  const introText = document.getElementById("introText");
+  const messageTitle = document.getElementById("messageTitle");
+  const messageBody = document.getElementById("messageBody");
+  const footerNote = document.getElementById("footerNote");
 
-  fireflyCount: 55,
 
-  dustCount: 90,
+  /* =======================================================
+     2. CONFIGURACIÓN
+  ======================================================= */
 
-  heartParticleCount: 130
-};
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
 
+  let gardenStarted = false;
+  let animationFrame = null;
 
-/* =========================
-   UTILIDADES
-========================= */
+  let galaxyRotation = 0;
+  let galaxyTilt = 60;
 
-const $ = (id) =>
-  document.getElementById(id);
+  let velocityRotation = 0;
+  let velocityTilt = 0;
 
+  let isDragging = false;
 
-function rand(min, max) {
+  let startX = 0;
+  let startY = 0;
 
-  return Math.random() *
-    (max - min) +
-    min;
+  let lastX = 0;
+  let lastY = 0;
 
-}
+  let lastMoveTime = 0;
 
+  let hintTimer = null;
 
-/* =========================
-   TEXTO
-========================= */
+  const isTouchDevice =
+    window.matchMedia("(pointer: coarse)").matches;
 
-document.title =
-  CONFIG.pageTitle;
 
+  /* =======================================================
+     3. UTILIDADES
+  ======================================================= */
 
-if ($("introTitle")) {
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
+  }
 
-  $("introTitle").textContent =
-    CONFIG.introTitle;
+  function randomInt(min, max) {
+    return Math.floor(random(min, max + 1));
+  }
 
-}
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
 
+  function setStyleVariable(element, name, value) {
+    if (!element) return;
+    element.style.setProperty(name, value);
+  }
 
-if ($("introText")) {
 
-  $("introText").textContent =
-    CONFIG.introText;
+  /* =======================================================
+     4. PREPARAR ESCENA
+  ======================================================= */
 
-}
+  if (scene) {
+    scene.classList.add("js-ready");
+  }
 
+  if (garden) {
+    garden.setAttribute("aria-hidden", "true");
+  }
 
-if ($("messageTitle")) {
+  if (letterOverlay) {
+    letterOverlay.setAttribute("aria-hidden", "true");
+  }
 
-  $("messageTitle").innerHTML =
-    `Feliz Día de las<br>
-     <strong>Flores Amarillas</strong> 🌻`;
 
-}
+  /* =======================================================
+     5. EFECTO DE ESCRITURA
+  ======================================================= */
 
+  function typeText(element, text, speed = 35) {
 
-if ($("messageBody")) {
+    if (!element || reducedMotion) {
+      if (element) {
+        element.textContent = text;
+      }
+      return;
+    }
 
-  $("messageBody").textContent =
-    CONFIG.messageBody;
+    element.textContent = "";
 
-}
+    let index = 0;
 
+    const timer = setInterval(() => {
 
-if ($("footerNote")) {
+      element.textContent += text.charAt(index);
+      index++;
 
-  $("footerNote").textContent =
-    CONFIG.footer;
+      if (index >= text.length) {
+        clearInterval(timer);
+      }
 
-}
+    }, speed);
+  }
 
 
-/* =========================
-   CONTENEDORES
-========================= */
+  /* =======================================================
+     6. ABRIR EL JARDÍN
+  ======================================================= */
 
-const flowers =
-  $("flowers");
+  function openGarden() {
 
-const petals =
-  $("petals");
+    if (gardenStarted) return;
 
-const fireflies =
-  $("fireflies");
+    gardenStarted = true;
 
-const goldDust =
-  $("goldDust");
+    if (intro) {
+      intro.classList.add("hide");
+    }
 
-const particleHeart =
-  $("particleHeart");
+    if (garden) {
+      garden.classList.add("show");
+      garden.setAttribute("aria-hidden", "false");
+    }
 
+    document.body.classList.add("garden-open");
 
-/* =========================
-   CREAR GIRASOL
-========================= */
+    createFlowers();
+    createPetals();
+    createFireflies();
+    createGoldDust();
 
-function createFlower(index) {
+    startGalaxyAnimation();
+    startHeartAnimation();
 
-  const el =
-    document.createElement("div");
+    if (messageBody && !reducedMotion) {
 
+      const originalText =
+        messageBody.textContent.trim().replace(/\s+/g, " ");
 
-  el.className =
-    "flower";
+      setTimeout(() => {
+        typeText(messageBody, originalText, 28);
+      }, 900);
+    }
 
+    showGalaxyHint();
 
-  el.style.setProperty(
-    "--left",
-    `${rand(-5, 96)}%`
-  );
+    setTimeout(() => {
+      if (footerNote) {
+        footerNote.classList.add("visible");
+      }
+    }, 2200);
+  }
 
 
-  el.style.setProperty(
-    "--scale",
-    rand(0.45, 1.18).toFixed(2)
-  );
+  /* =======================================================
+     7. BOTÓN INICIAR
+  ======================================================= */
 
+  if (openBtn) {
 
-  el.style.setProperty(
-    "--rot",
-    `${rand(-8, 8).toFixed(1)}deg`
-  );
+    openBtn.addEventListener("click", () => {
 
+      openBtn.classList.add("pressed");
 
-  el.style.setProperty(
-    "--delay",
-    `${(
-      index * 0.08 +
-      rand(0, 0.7)
-    ).toFixed(2)}s`
-  );
+      setTimeout(() => {
+        openGarden();
+      }, reducedMotion ? 0 : 450);
 
+    });
 
-  /*
-    Algunos girasoles serán más grandes
-    para que se parezca más a la referencia.
-  */
+  }
 
-  if (index === 0) {
 
-    el.classList.add("flower-big");
+  /* =======================================================
+     8. GALAXIA — ANIMACIÓN AUTOMÁTICA
+  ======================================================= */
 
-    el.style.setProperty(
-      "--left",
-      "13%"
+  function updateGalaxyTransform() {
+
+    if (!galaxyScene) return;
+
+    const viewportWidth = window.innerWidth;
+
+    let baseTilt = viewportWidth <= 600 ? 62 : 60;
+
+    const finalTilt =
+      clamp(baseTilt + galaxyTilt - 60, 40, 82);
+
+    galaxyScene.style.transform =
+      `translate(-50%, -50%)
+       rotateX(${finalTilt}deg)
+       rotateZ(${galaxyRotation}deg)
+       rotateY(${galaxyTilt - 60}deg)`;
+
+  }
+
+
+  function startGalaxyAnimation() {
+
+    if (!galaxyScene) return;
+
+    if (animationFrame) {
+      cancelAnimationFrame(animationFrame);
+    }
+
+    let previousTime = performance.now();
+
+    function animate(currentTime) {
+
+      const delta =
+        Math.min((currentTime - previousTime) / 16.6667, 3);
+
+      previousTime = currentTime;
+
+      if (!isDragging) {
+
+        if (!reducedMotion) {
+
+          /* Rotación automática */
+          galaxyRotation += 0.055 * delta;
+
+          /* Inercia después de arrastrar */
+          galaxyRotation += velocityRotation * delta;
+          galaxyTilt += velocityTilt * delta;
+
+          velocityRotation *= Math.pow(0.94, delta);
+          velocityTilt *= Math.pow(0.94, delta);
+
+          galaxyTilt = clamp(
+            galaxyTilt,
+            45,
+            75
+          );
+
+        }
+
+      }
+
+      updateGalaxyTransform();
+
+      animationFrame =
+        requestAnimationFrame(animate);
+    }
+
+    animationFrame =
+      requestAnimationFrame(animate);
+  }
+
+
+  /* =======================================================
+     9. GALAXIA — ARRASTRAR CON RATÓN / TÁCTIL
+  ======================================================= */
+
+  if (galaxyWrapper) {
+
+    galaxyWrapper.style.touchAction = "none";
+
+    galaxyWrapper.addEventListener(
+      "pointerdown",
+      (event) => {
+
+        if (!gardenStarted) return;
+
+        isDragging = true;
+
+        startX = event.clientX;
+        startY = event.clientY;
+
+        lastX = event.clientX;
+        lastY = event.clientY;
+
+        lastMoveTime = performance.now();
+
+        velocityRotation = 0;
+        velocityTilt = 0;
+
+        galaxyWrapper.classList.add("dragging");
+
+        try {
+          galaxyWrapper.setPointerCapture(event.pointerId);
+        } catch (error) {
+          /* Algunos navegadores no soportan pointer capture */
+        }
+
+        hideGalaxyHint();
+
+        event.preventDefault();
+      },
+      { passive: false }
     );
 
-    el.style.setProperty(
-      "--scale",
-      "1.35"
+
+    galaxyWrapper.addEventListener(
+      "pointermove",
+      (event) => {
+
+        if (!isDragging) return;
+
+        const now = performance.now();
+
+        const dx = event.clientX - lastX;
+        const dy = event.clientY - lastY;
+
+        const elapsed =
+          Math.max(now - lastMoveTime, 8);
+
+        galaxyRotation += dx * 0.45;
+
+        galaxyTilt += dy * 0.16;
+
+        galaxyTilt = clamp(
+          galaxyTilt,
+          40,
+          80
+        );
+
+        velocityRotation =
+          (dx / elapsed) * 0.65;
+
+        velocityTilt =
+          (dy / elapsed) * 0.10;
+
+        lastX = event.clientX;
+        lastY = event.clientY;
+
+        lastMoveTime = now;
+
+        updateGalaxyTransform();
+
+        event.preventDefault();
+
+      },
+      { passive: false }
+    );
+
+
+    function stopDragging(event) {
+
+      if (!isDragging) return;
+
+      isDragging = false;
+
+      galaxyWrapper.classList.remove("dragging");
+
+      try {
+        galaxyWrapper.releasePointerCapture(event.pointerId);
+      } catch (error) {
+        /* Nada que hacer */
+      }
+
+    }
+
+
+    galaxyWrapper.addEventListener(
+      "pointerup",
+      stopDragging
+    );
+
+    galaxyWrapper.addEventListener(
+      "pointercancel",
+      stopDragging
+    );
+
+    galaxyWrapper.addEventListener(
+      "pointerleave",
+      (event) => {
+
+        if (
+          isDragging &&
+          event.pointerType === "mouse"
+        ) {
+          stopDragging(event);
+        }
+
+      }
     );
 
   }
 
 
-  if (index === 1) {
+  /* =======================================================
+     10. MENSAJE DE LA GALAXIA
+  ======================================================= */
 
-    el.classList.add("flower-big");
+  function showGalaxyHint() {
 
-    el.style.setProperty(
-      "--left",
-      "78%"
-    );
+    if (!galaxyHint) return;
 
-    el.style.setProperty(
-      "--scale",
-      "1.20"
-    );
+    clearTimeout(hintTimer);
 
+    galaxyHint.classList.remove("hide");
+
+    hintTimer = setTimeout(() => {
+      hideGalaxyHint();
+    }, 5000);
   }
 
 
-  el.innerHTML = `
+  function hideGalaxyHint() {
 
-    <div class="stem"></div>
+    if (!galaxyHint) return;
 
-    <div class="leaf left"></div>
-
-    <div class="leaf right"></div>
-
-    <div class="head">
-
-      ${Array.from(
-        { length: 12 },
-        () => `<i class="petal"></i>`
-      ).join("")}
-
-      <b class="center"></b>
-
-    </div>
-
-  `;
-
-
-  flowers.appendChild(el);
-
-}
-
-
-/* =========================
-   PÉTALOS
-========================= */
-
-function createPetals() {
-
-  for (
-    let i = 0;
-    i < CONFIG.petalCount;
-    i++
-  ) {
-
-    const el =
-      document.createElement("i");
-
-
-    el.className =
-      "petal-float";
-
-
-    el.style.setProperty(
-      "--left",
-      `${rand(0, 100)}%`
-    );
-
-
-    el.style.setProperty(
-      "--duration",
-      `${rand(8, 16).toFixed(1)}s`
-    );
-
-
-    el.style.setProperty(
-      "--delay",
-      `${rand(-15, 0).toFixed(1)}s`
-    );
-
-
-    el.style.setProperty(
-      "--drift",
-      `${rand(-160, 160).toFixed(0)}px`
-    );
-
-
-    el.style.setProperty(
-      "--size",
-      `${rand(8, 16).toFixed(0)}px`
-    );
-
-
-    petals.appendChild(el);
-
+    galaxyHint.classList.add("hide");
   }
 
-}
 
+  /* =======================================================
+     11. CREAR GIRASOLES DEL JARDÍN
+  ======================================================= */
 
-/* =========================
-   LUCIÉRNAGAS
-========================= */
+  function createFlowers() {
 
-function createFireflies() {
+    if (!flowersContainer) return;
 
-  for (
-    let i = 0;
-    i < CONFIG.fireflyCount;
-    i++
-  ) {
+    flowersContainer.innerHTML = "";
 
-    const el =
-      document.createElement("i");
+    const width = window.innerWidth;
 
+    let count;
 
-    el.className =
-      "firefly";
+    if (width < 400) {
+      count = 7;
+    } else if (width < 700) {
+      count = 10;
+    } else if (width < 1100) {
+      count = 14;
+    } else {
+      count = 20;
+    }
 
+    for (let i = 0; i < count; i++) {
 
-    el.style.setProperty(
-      "--left",
-      `${rand(2, 98)}%`
-    );
+      const flower = document.createElement("div");
 
+      flower.className = "flower";
 
-    el.style.setProperty(
-      "--top",
-      `${rand(18, 94)}%`
-    );
+      const size =
+        width < 500
+          ? random(28, 54)
+          : random(38, 76);
 
+      const left =
+        random(2, 98);
 
-    el.style.setProperty(
-      "--duration",
-      `${rand(1.4, 3.8).toFixed(2)}s`
-    );
+      const bottom =
+        random(-2, 32);
 
+      const sway =
+        random(3.5, 7.5);
 
-    el.style.setProperty(
-      "--delay",
-      `${rand(0, 3).toFixed(2)}s`
-    );
+      const delay =
+        random(0, 5);
 
+      const rotation =
+        random(-18, 18);
 
-    fireflies.appendChild(el);
+      setStyleVariable(
+        flower,
+        "--left",
+        `${left}%`
+      );
 
-  }
+      setStyleVariable(
+        flower,
+        "--bottom",
+        `${bottom}%`
+      );
 
-}
+      setStyleVariable(
+        flower,
+        "--size",
+        `${size}px`
+      );
 
+      setStyleVariable(
+        flower,
+        "--sway",
+        `${sway}s`
+      );
 
-/* =========================
-   POLVO DORADO
-========================= */
+      setStyleVariable(
+        flower,
+        "--delay",
+        `${delay}s`
+      );
 
-function createGoldDust() {
+      setStyleVariable(
+        flower,
+        "--rotation",
+        `${rotation}deg`
+      );
 
-  if (!goldDust) return;
-
-
-  goldDust.innerHTML = "";
-
-
-  for (
-    let i = 0;
-    i < CONFIG.dustCount;
-    i++
-  ) {
-
-    const particle =
-      document.createElement("i");
-
-
-    particle.style.position =
-      "absolute";
-
-
-    particle.style.left =
-      `${rand(0, 100)}%`;
-
-
-    particle.style.top =
-      `${rand(0, 100)}%`;
-
-
-    const size =
-      rand(1, 3.5);
-
-
-    particle.style.width =
-      `${size}px`;
-
-
-    particle.style.height =
-      `${size}px`;
-
-
-    particle.style.borderRadius =
-      "50%";
-
-
-    particle.style.background =
-      "#ffe36a";
-
-
-    particle.style.boxShadow =
-      "0 0 8px rgba(255,210,35,.8)";
-
-
-    particle.style.opacity =
-      rand(0.15, 0.8).toFixed(2);
-
-
-    particle.style.animation =
-      `
-      dustParticle
-      ${rand(3, 7).toFixed(2)}s
-      ease-in-out
-      ${rand(0, 5).toFixed(2)}s
-      infinite alternate
+      flower.innerHTML = `
+        <div class="flower-stem"></div>
+        <div class="flower-head">
+          <span class="petal p1"></span>
+          <span class="petal p2"></span>
+          <span class="petal p3"></span>
+          <span class="petal p4"></span>
+          <span class="petal p5"></span>
+          <span class="petal p6"></span>
+          <span class="petal p7"></span>
+          <span class="petal p8"></span>
+          <span class="flower-center"></span>
+        </div>
       `;
 
-
-    goldDust.appendChild(
-      particle
-    );
-
+      flowersContainer.appendChild(flower);
+    }
   }
 
-}
 
+  /* =======================================================
+     12. PÉTALOS VOLANDO
+  ======================================================= */
 
-/* =========================
-   CORAZÓN DE PARTÍCULAS
-========================= */
+  function createPetals() {
 
-function createParticleHeart() {
+    if (!petalsContainer) return;
 
-  if (!particleHeart) return;
+    petalsContainer.innerHTML = "";
 
+    const width = window.innerWidth;
 
-  particleHeart.innerHTML = "";
+    const count =
+      width < 500 ? 18 :
+      width < 900 ? 26 :
+      36;
 
+    for (let i = 0; i < count; i++) {
 
-  const total =
-    CONFIG.heartParticleCount;
+      const petal =
+        document.createElement("span");
 
+      petal.className = "petal-float";
 
-  for (
-    let i = 0;
-    i < total;
-    i++
-  ) {
+      const left =
+        random(-5, 105);
 
-    const t =
-      (Math.PI * 2 * i) /
-      total;
+      const size =
+        width < 500
+          ? random(7, 15)
+          : random(8, 19);
 
+      const duration =
+        random(7, 16);
 
-    /*
-      Fórmula matemática para
-      dibujar un corazón.
-    */
+      const delay =
+        random(-16, 10);
 
-    const x =
-      16 *
-      Math.pow(
-        Math.sin(t),
-        3
+      const drift =
+        random(-180, 180);
+
+      const rotate =
+        random(0, 720);
+
+      setStyleVariable(
+        petal,
+        "--left",
+        `${left}%`
       );
 
-
-    const y =
-      -(
-        13 * Math.cos(t)
-        - 5 * Math.cos(2 * t)
-        - 2 * Math.cos(3 * t)
-        - Math.cos(4 * t)
+      setStyleVariable(
+        petal,
+        "--size",
+        `${size}px`
       );
 
+      setStyleVariable(
+        petal,
+        "--duration",
+        `${duration}s`
+      );
 
-    const particle =
-      document.createElement("i");
+      setStyleVariable(
+        petal,
+        "--delay",
+        `${delay}s`
+      );
+
+      setStyleVariable(
+        petal,
+        "--drift",
+        `${drift}px`
+      );
+
+      setStyleVariable(
+        petal,
+        "--rotate",
+        `${rotate}deg`
+      );
+
+      petal.style.animationDelay =
+        `${delay}s`;
+
+      petalsContainer.appendChild(petal);
+    }
+  }
 
 
-    particle.className =
-      "heart-dot";
+  /* =======================================================
+     13. LUCIÉRNAGAS
+  ======================================================= */
+
+  function createFireflies() {
+
+    if (!firefliesContainer) return;
+
+    firefliesContainer.innerHTML = "";
+
+    const width = window.innerWidth;
+
+    const count =
+      width < 500 ? 18 :
+      width < 900 ? 28 :
+      42;
+
+    for (let i = 0; i < count; i++) {
+
+      const firefly =
+        document.createElement("span");
+
+      firefly.className = "firefly";
+
+      setStyleVariable(
+        firefly,
+        "--left",
+        `${random(2, 98)}%`
+      );
+
+      setStyleVariable(
+        firefly,
+        "--top",
+        `${random(5, 88)}%`
+      );
+
+      setStyleVariable(
+        firefly,
+        "--size",
+        `${random(2, 6)}px`
+      );
+
+      setStyleVariable(
+        firefly,
+        "--duration",
+        `${random(3, 8)}s`
+      );
+
+      setStyleVariable(
+        firefly,
+        "--delay",
+        `${random(-8, 2)}s`
+      );
+
+      firefliesContainer.appendChild(firefly);
+    }
+  }
 
 
-    particle.style.setProperty(
-      "--x",
-      `${x}px`
+  /* =======================================================
+     14. POLVO DORADO
+  ======================================================= */
+
+  function createGoldDust() {
+
+    if (!goldDust) return;
+
+    goldDust.innerHTML = "";
+
+    const width = window.innerWidth;
+
+    const count =
+      width < 500 ? 35 :
+      width < 900 ? 55 :
+      80;
+
+    for (let i = 0; i < count; i++) {
+
+      const particle =
+        document.createElement("span");
+
+      particle.className = "dust-particle";
+
+      setStyleVariable(
+        particle,
+        "--left",
+        `${random(0, 100)}%`
+      );
+
+      setStyleVariable(
+        particle,
+        "--top",
+        `${random(0, 100)}%`
+      );
+
+      setStyleVariable(
+        particle,
+        "--size",
+        `${random(1, 4)}px`
+      );
+
+      setStyleVariable(
+        particle,
+        "--duration",
+        `${random(4, 10)}s`
+      );
+
+      setStyleVariable(
+        particle,
+        "--delay",
+        `${random(-10, 0)}s`
+      );
+
+      goldDust.appendChild(particle);
+    }
+  }
+
+
+  /* =======================================================
+     15. CORAZÓN / PARTÍCULAS
+  ======================================================= */
+
+  function startHeartAnimation() {
+
+    if (!particleHeart) return;
+
+    particleHeart.innerHTML = "";
+
+    const symbols = [
+      "💛",
+      "✨",
+      "🌼",
+      "🌻",
+      "♡"
+    ];
+
+    const count =
+      reducedMotion ? 4 : 12;
+
+    for (let i = 0; i < count; i++) {
+
+      const item =
+        document.createElement("span");
+
+      item.textContent =
+        symbols[
+          randomInt(0, symbols.length - 1)
+        ];
+
+      item.style.left =
+        `${random(10, 90)}%`;
+
+      item.style.top =
+        `${random(20, 80)}%`;
+
+      item.style.animationDelay =
+        `${random(-6, 0)}s`;
+
+      item.style.animationDuration =
+        `${random(4, 8)}s`;
+
+      particleHeart.appendChild(item);
+    }
+  }
+
+
+  /* =======================================================
+     16. CARTA
+  ======================================================= */
+
+  function openLetter() {
+
+    if (!letterOverlay) return;
+
+    letterOverlay.classList.add("show");
+
+    letterOverlay.setAttribute(
+      "aria-hidden",
+      "false"
     );
 
+    document.body.classList.add("letter-open");
 
-    particle.style.setProperty(
-      "--y",
-      `${y}px`
+    if (closeLetter) {
+      setTimeout(() => {
+        closeLetter.focus();
+      }, 150);
+    }
+  }
+
+
+  function closeLetterModal() {
+
+    if (!letterOverlay) return;
+
+    letterOverlay.classList.remove("show");
+
+    letterOverlay.setAttribute(
+      "aria-hidden",
+      "true"
     );
 
-
-    particle.style.setProperty(
-      "--delay",
-      `${rand(0, 2).toFixed(2)}s`
+    document.body.classList.remove(
+      "letter-open"
     );
 
+    if (letterBtn) {
+      setTimeout(() => {
+        letterBtn.focus();
+      }, 100);
+    }
+  }
 
-    particle.style.setProperty(
-      "--size",
-      `${rand(2, 4.5).toFixed(1)}px`
-    );
 
+  if (letterBtn) {
 
-    particleHeart.appendChild(
-      particle
+    letterBtn.addEventListener(
+      "click",
+      openLetter
     );
 
   }
 
-}
 
+  if (closeLetter) {
 
-/* =========================
-   CONSTRUIR ESCENA
-========================= */
-
-function buildScene() {
-
-  if (flowers)
-    flowers.innerHTML = "";
-
-
-  if (petals)
-    petals.innerHTML = "";
-
-
-  if (fireflies)
-    fireflies.innerHTML = "";
-
-
-  for (
-    let i = 0;
-    i < CONFIG.flowerCount;
-    i++
-  ) {
-
-    createFlower(i);
+    closeLetter.addEventListener(
+      "click",
+      closeLetterModal
+    );
 
   }
 
 
-  createPetals();
+  if (letterOverlay) {
 
-  createFireflies();
+    letterOverlay.addEventListener(
+      "click",
+      (event) => {
 
-  createGoldDust();
+        if (
+          event.target === letterOverlay
+        ) {
+          closeLetterModal();
+        }
 
-  createParticleHeart();
+      }
+    );
 
-}
+  }
 
 
-/* =========================
-   ABRIR
-========================= */
+  /* =======================================================
+     17. TECLA ESC PARA CERRAR CARTA
+  ======================================================= */
 
-function openSurprise() {
-
-  const intro =
-    $("intro");
-
-  const garden =
-    $("garden");
-
-
-  if (!intro || !garden)
-    return;
-
-
-  intro.classList.add(
-    "hide"
-  );
-
-
-  garden.classList.add(
-    "show"
-  );
-
-
-  garden.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-
-  buildScene();
-
-}
-
-
-/* =========================
-   CARTA
-========================= */
-
-function openLetter() {
-
-  const overlay =
-    $("letterOverlay");
-
-
-  if (!overlay)
-    return;
-
-
-  overlay.classList.add(
-    "open"
-  );
-
-
-  overlay.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-}
-
-
-function closeLetter() {
-
-  const overlay =
-    $("letterOverlay");
-
-
-  if (!overlay)
-    return;
-
-
-  overlay.classList.remove(
-    "open"
-  );
-
-
-  overlay.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-}
-
-
-/* =========================
-   REPETIR
-========================= */
-
-function replay() {
-
-  closeLetter();
-
-
-  const intro =
-    $("intro");
-
-  const garden =
-    $("garden");
-
-
-  if (!intro || !garden)
-    return;
-
-
-  garden.classList.remove(
-    "show"
-  );
-
-
-  intro.classList.remove(
-    "hide"
-  );
-
-
-  garden.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-
-  window.setTimeout(
-    buildScene,
-    500
-  );
-
-}
-
-
-/* =========================
-   EVENTOS
-========================= */
-
-if ($("openBtn")) {
-
-  $("openBtn").addEventListener(
-    "click",
-    openSurprise
-  );
-
-}
-
-
-if ($("replayBtn")) {
-
-  $("replayBtn").addEventListener(
-    "click",
-    replay
-  );
-
-}
-
-
-if ($("letterBtn")) {
-
-  $("letterBtn").addEventListener(
-    "click",
-    openLetter
-  );
-
-}
-
-
-if ($("closeLetter")) {
-
-  $("closeLetter").addEventListener(
-    "click",
-    closeLetter
-  );
-
-}
-
-
-if ($("letterOverlay")) {
-
-  $("letterOverlay").addEventListener(
-    "click",
+  document.addEventListener(
+    "keydown",
     (event) => {
 
-      if (
-        event.target ===
-        $("letterOverlay")
-      ) {
+      if (event.key === "Escape") {
 
-        closeLetter();
+        if (
+          letterOverlay &&
+          letterOverlay.classList.contains("show")
+        ) {
+          closeLetterModal();
+        }
 
       }
 
     }
   );
 
-}
 
+  /* =======================================================
+     18. REPLAY
+  ======================================================= */
 
-/* =========================
-   ESC
-========================= */
+  function replay() {
 
-document.addEventListener(
-  "keydown",
-  (event) => {
+    document.body.classList.remove(
+      "garden-open",
+      "letter-open"
+    );
 
-    if (
-      event.key === "Escape"
-    ) {
+    closeLetterModal();
 
-      closeLetter();
+    gardenStarted = false;
 
+    galaxyRotation = 0;
+    galaxyTilt = 60;
+
+    velocityRotation = 0;
+    velocityTilt = 0;
+
+    isDragging = false;
+
+    if (footerNote) {
+      footerNote.classList.remove("visible");
     }
 
+    if (galaxyHint) {
+      galaxyHint.classList.remove("hide");
+    }
+
+    if (garden) {
+      garden.classList.remove("show");
+      garden.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+    }
+
+    if (intro) {
+      intro.classList.remove("hide");
+    }
+
+    if (openBtn) {
+      openBtn.classList.remove("pressed");
+    }
+
+    if (flowersContainer) {
+      flowersContainer.innerHTML = "";
+    }
+
+    if (petalsContainer) {
+      petalsContainer.innerHTML = "";
+    }
+
+    if (firefliesContainer) {
+      firefliesContainer.innerHTML = "";
+    }
+
+    if (goldDust) {
+      goldDust.innerHTML = "";
+    }
+
+    if (particleHeart) {
+      particleHeart.innerHTML = "";
+    }
+
+    updateGalaxyTransform();
+
+    window.scrollTo({
+      top: 0,
+      behavior: reducedMotion
+        ? "auto"
+        : "smooth"
+    });
+
+    setTimeout(() => {
+
+      if (openBtn) {
+        openBtn.focus();
+      }
+
+    }, 500);
   }
-);
 
 
-/* =========================
-   INICIO
-========================= */
+  if (replayBtn) {
 
-buildScene();
+    replayBtn.addEventListener(
+      "click",
+      replay
+    );
+
+  }
+
+
+  /* =======================================================
+     19. REDIMENSIONAR PANTALLA
+  ======================================================= */
+
+  let resizeTimer;
+
+  window.addEventListener(
+    "resize",
+    () => {
+
+      clearTimeout(resizeTimer);
+
+      resizeTimer = setTimeout(() => {
+
+        if (!gardenStarted) return;
+
+        createFlowers();
+        createPetals();
+        createFireflies();
+        createGoldDust();
+
+        updateGalaxyTransform();
+
+      }, 250);
+
+    }
+  );
+
+
+    /* =======================================================
+     20. ORIENTACIÓN DEL TELÉFONO
+  ======================================================= */
+
+  window.addEventListener(
+    "orientationchange",
+    () => {
+
+      setTimeout(() => {
+
+        if (gardenStarted) 
